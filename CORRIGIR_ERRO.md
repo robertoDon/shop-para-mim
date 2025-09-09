@@ -28,6 +28,8 @@
 - ✅ Versão do Python (3.11.9)
 - ✅ Dependências atualizadas
 - ✅ Compatibilidade com Render
+- ✅ **Template login inline** (correção definitiva!)
+- ✅ Sistema de fallback para templates
 
 ## 🎯 **Após a correção:**
 
