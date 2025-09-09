@@ -75,24 +75,16 @@ http://localhost:5000
 
 ### ⚡ Início Rápido (Recomendado)
 
-**Uso Local:**
-```bash
-# Inicie o sistema localmente
-./iniciar.sh     # Linux/Mac
-# ou
-iniciar.bat      # Windows
+**Hospedagem Gratuita Permanente (RECOMENDADO):**
+- 📖 **Veja:** `HOSPEDAGEM_GRATUITA.md`
+- 🌐 **Resultado:** Site online 24/7 sem você precisar rodar nada
+- 💰 **Custo:** R$ 0,00
+- 🔗 **URL:** Ex: https://shoppramim.onrender.com
 
+**Uso Local (Para testes):**
+```bash
+./iniciar.sh     # Windows: iniciar.bat
 # Acesse: http://localhost:5001
-# Login: admin / 123456
-```
-
-**Uso Online (Outras pessoas acessam de qualquer lugar):**
-```bash
-# Inicie o sistema online
-./iniciar_online.sh
-
-# Sistema mostra URL pública
-# Compartilhe a URL com quem quiser
 # Login: admin / 123456
 ```
 
