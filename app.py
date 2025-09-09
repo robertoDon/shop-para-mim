@@ -274,17 +274,52 @@ def analytics():
 # Registrar função auxiliar no contexto do template
 app.jinja_env.globals.update(get_color_code=get_color_code)
 
+def inicializar_dados():
+    """Inicializa banco e dados básicos"""
+    db.create_all()
+    
+    # Criar usuário thales se não existir
+    if Usuario.query.count() == 0:
+        thales = Usuario(username='thales', nome='Thales')
+        thales.set_password('thales')
+        db.session.add(thales)
+        db.session.commit()
+        print("✅ Usuário thales criado!")
+    
+    # Criar alguns dados de exemplo se não existirem
+    if Cliente.query.count() == 0:
+        from datetime import timedelta
+        import random
+        
+        # Clientes de exemplo
+        clientes_dados = [
+            ('João Silva', 'joao@email.com', '(11) 99999-1111', 'M', 28, '42'),
+            ('Maria Santos', 'maria@email.com', '(11) 99999-2222', 'F', 25, '37'),
+            ('Pedro Costa', 'pedro@email.com', '(11) 99999-3333', 'M', 35, '41'),
+            ('Ana Oliveira', 'ana@email.com', '(11) 99999-4444', 'F', 30, '38'),
+            ('Carlos Ferreira', 'carlos@email.com', '(11) 99999-5555', 'M', 22, '43')
+        ]
+        
+        for dados in clientes_dados:
+            cliente = Cliente(
+                nome=dados[0], email=dados[1], telefone=dados[2],
+                genero=dados[3], idade=dados[4], tamanho_preferido=dados[5],
+                data_cadastro=datetime.now() - timedelta(days=random.randint(30, 365))
+            )
+            db.session.add(cliente)
+        
+        db.session.commit()
+        print("✅ Dados de exemplo criados!")
+
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()
-        # Criar usuário thales se não existir
-        if Usuario.query.count() == 0:
-            thales = Usuario(username='thales', nome='Thales')
-            thales.set_password('thales')
-            db.session.add(thales)
-            db.session.commit()
+        inicializar_dados()
     
     # Para hospedagem em produção
     import os
     port = int(os.environ.get('PORT', 5001))
     app.run(debug=False, host='0.0.0.0', port=port)
+else:
+    # Quando executado pelo gunicorn
+    with app.app_context():
+        inicializar_dados()
