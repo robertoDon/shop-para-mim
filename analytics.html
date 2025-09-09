@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block title %}Relatórios - Shop Pra Mim{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h3 mb-0">Relatórios e Análises</h1>
+        <p class="text-muted">Insights do seu negócio</p>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Vendas por Marca -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-tags me-2"></i>Vendas por Marca
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if marcas %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Marca</th>
+                                <th>Vendas</th>
+                                <th>Receita</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for marca, vendas, receita in marcas %}
+                            <tr>
+                                <td><strong>{{ marca }}</strong></td>
+                                <td>{{ vendas }}</td>
+                                <td class="text-success">R$ {{ "%.2f"|format(receita) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center">Nenhuma venda registrada ainda.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cores Mais Vendidas -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-palette me-2"></i>Cores Mais Vendidas
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if cores %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Cor</th>
+                                <th>Quantidade</th>
+                                <th>Popularidade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cor, quantidade in cores %}
+                            <tr>
+                                <td>
+                                    <span class="badge me-2" style="background-color: {{ get_color_code(cor) }}; color: white;">&nbsp;</span>
+                                    {{ cor }}
+                                </td>
+                                <td>{{ quantidade }}</td>
+                                <td>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar" style="width: {{ (quantidade / cores[0][1] * 100)|round }}%;"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center">Nenhuma venda registrada ainda.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Distribuição por Gênero -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-user-friends me-2"></i>Clientes por Gênero
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if generos %}
+                <div class="row text-center">
+                    {% for genero, quantidade in generos %}
+                    <div class="col-6">
+                        <div class="p-3 border rounded">
+                            <i class="fas fa-{{ 'male text-primary' if genero == 'M' else 'female text-danger' }} fa-2x mb-2"></i>
+                            <h4 class="mb-1">{{ quantidade }}</h4>
+                            <small class="text-muted">{{ 'Masculino' if genero == 'M' else 'Feminino' }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center">Nenhum cliente cadastrado ainda.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Resumo Geral -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-line me-2"></i>Resumo Geral
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Marca Mais Vendida:</span>
+                            <strong>
+                                {% if marcas %}
+                                    {{ marcas[0][0] }} ({{ marcas[0][1] }} vendas)
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </strong>
+                        </div>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Cor Mais Popular:</span>
+                            <strong>
+                                {% if cores %}
+                                    {{ cores[0][0] }} ({{ cores[0][1] }} vendas)
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </strong>
+                        </div>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Ticket Médio:</span>
+                            <strong class="text-success">
+                                {% if marcas %}
+                                    R$ {{ "%.2f"|format((marcas|sum(attribute=2)) / (marcas|sum(attribute=1))) }}
+                                {% else %}
+                                    R$ 0,00
+                                {% endif %}
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-lightbulb fa-2x text-warning mb-3"></i>
+                <h5>Dicas para Aumentar as Vendas</h5>
+                <div class="row mt-4">
+                    <div class="col-md-4">
+                        <div class="p-3">
+                            <i class="fas fa-bullseye fa-2x text-primary mb-2"></i>
+                            <h6>Use as Recomendações</h6>
+                            <small class="text-muted">Sempre que chegar um produto novo, use nosso sistema de recomendação para indicar aos clientes certos.</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3">
+                            <i class="fas fa-chart-bar fa-2x text-success mb-2"></i>
+                            <h6>Analise os Dados</h6>
+                            <small class="text-muted">Use estes relatórios para entender quais marcas e cores vendem mais e ajuste seu estoque.</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3">
+                            <i class="fas fa-users fa-2x text-info mb-2"></i>
+                            <h6>Mantenha Contato</h6>
+                            <small class="text-muted">Clientes frequentes são seu maior tesouro. Use o WhatsApp para manter contato.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function getColorCode(color) {
+    const colors = {
+        'Preto': '#000000',
+        'Branco': '#ffffff',
+        'Azul': '#0066cc',
+        'Vermelho': '#cc0000',
+        'Verde': '#00cc00',
+        'Amarelo': '#cccc00',
+        'Rosa': '#ff69b4',
+        'Roxo': '#8B00FF',
+        'Laranja': '#ff8c00',
+        'Cinza': '#808080',
+        'Marrom': '#8B4513'
+    };
+    return colors[color] || '#6c757d';
+}
+</script>
+{% endblock %}

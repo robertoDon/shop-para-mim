@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Produtos - Shop Pra Mim{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h3 mb-0">Estoque de Produtos</h1>
+                <p class="text-muted">Gerencie seu estoque de tênis</p>
+            </div>
+            <a href="{{ url_for('cadastrar_produto') }}" class="btn btn-info">
+                <i class="fas fa-plus me-2"></i>Adicionar Produto
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                {% if produtos %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Produto</th>
+                                <th>Cor</th>
+                                <th>Tamanho</th>
+                                <th>Preço</th>
+                                <th>Data de Chegada</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for produto in produtos %}
+                            <tr>
+                                <td>
+                                    <strong>{{ produto.marca }} {{ produto.modelo }}</strong>
+                                </td>
+                                <td>
+                                    <span class="badge" style="background-color: {{ get_color_code(produto.cor) }}; color: white;">
+                                        {{ produto.cor }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ produto.tamanho }}</span>
+                                </td>
+                                <td>
+                                    <strong class="text-success">R$ {{ "%.2f"|format(produto.preco) }}</strong>
+                                </td>
+                                <td>{{ produto.data_chegada.strftime('%d/%m/%Y') }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if not produto.vendido else 'secondary' }}">
+                                        {{ 'Disponível' if not produto.vendido else 'Vendido' }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-box fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Nenhum produto no estoque</h5>
+                    <p class="text-muted">Adicione produtos ao seu estoque para começar!</p>
+                    <a href="{{ url_for('cadastrar_produto') }}" class="btn btn-info">
+                        <i class="fas fa-plus me-2"></i>Adicionar Primeiro Produto
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function getColorCode(color) {
+    const colors = {
+        'Preto': '#000000',
+        'Branco': '#ffffff',
+        'Azul': '#0066cc',
+        'Vermelho': '#cc0000',
+        'Verde': '#00cc00',
+        'Amarelo': '#cccc00',
+        'Rosa': '#ff69b4',
+        'Roxo': '#8B00FF',
+        'Laranja': '#ff8c00',
+        'Cinza': '#808080',
+        'Marrom': '#8B4513'
+    };
+    return colors[color] || '#6c757d';
+}
+</script>
+{% endblock %}

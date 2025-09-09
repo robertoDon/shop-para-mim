@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Clientes - Shop Pra Mim{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h3 mb-0">Clientes</h1>
+                <p class="text-muted">Gerencie sua base de clientes</p>
+            </div>
+            <a href="{{ url_for('cadastrar_cliente') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Novo Cliente
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                {% if clientes %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nome</th>
+                                <th>Email</th>
+                                <th>Telefone</th>
+                                <th>Gênero</th>
+                                <th>Idade</th>
+                                <th>Tamanho Preferido</th>
+                                <th>Data Cadastro</th>
+                                <th>Total de Compras</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cliente in clientes %}
+                            <tr>
+                                <td>
+                                    <strong>{{ cliente.nome }}</strong>
+                                </td>
+                                <td>{{ cliente.email }}</td>
+                                <td>{{ cliente.telefone or '-' }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'primary' if cliente.genero == 'M' else 'pink' }}">
+                                        {{ 'Masculino' if cliente.genero == 'M' else 'Feminino' }}
+                                    </span>
+                                </td>
+                                <td>{{ cliente.idade }} anos</td>
+                                <td>{{ cliente.tamanho_preferido or '-' }}</td>
+                                <td>{{ cliente.data_cadastro.strftime('%d/%m/%Y') }}</td>
+                                <td>
+                                    <span class="badge bg-success">{{ cliente.vendas|length }}</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Nenhum cliente cadastrado</h5>
+                    <p class="text-muted">Comece cadastrando seu primeiro cliente!</p>
+                    <a href="{{ url_for('cadastrar_cliente') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Cadastrar Primeiro Cliente
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+.bg-pink {
+    background-color: #e91e63 !important;
+}
+</style>
+{% endblock %}
