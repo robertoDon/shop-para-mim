@@ -87,6 +87,60 @@ class Produto(db.Model):
     data_chegada = db.Column(db.DateTime, default=datetime.utcnow)
     vendido = db.Column(db.Boolean, default=False)
 
+# Template inline para resolver erro no Render
+LOGIN_TEMPLATE = '''
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Shop Pra Mim</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .login-card { background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); overflow: hidden; max-width: 400px; width: 100%; }
+        .login-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; }
+        .login-body { padding: 30px; }
+        .btn-login { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; width: 100%; padding: 12px; border-radius: 8px; color: white; font-weight: 500; }
+        .form-control { border-radius: 8px; padding: 12px; border: 2px solid #e9ecef; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="login-header">
+            <i class="fas fa-shopping-bag fa-3x mb-3"></i>
+            <h2 class="mb-0">Shop Pra Mim</h2>
+            <p class="mb-0 opacity-75">Sistema de Gestão</p>
+        </div>
+        <div class="login-body">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <form method="POST">
+                <div class="mb-3">
+                    <label for="username" class="form-label"><i class="fas fa-user me-2"></i>Usuário</label>
+                    <input type="text" class="form-control" id="username" name="username" required value="admin">
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="form-label"><i class="fas fa-lock me-2"></i>Senha</label>
+                    <input type="password" class="form-control" id="password" name="password" required value="123456">
+                </div>
+                <button type="submit" class="btn btn-login"><i class="fas fa-sign-in-alt me-2"></i>Entrar</button>
+            </form>
+            <div class="mt-4 text-center">
+                <small class="text-muted"><i class="fas fa-info-circle me-1"></i>Credenciais: <strong>admin</strong> / <strong>123456</strong></small>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+'''
+
 # Rotas de autenticação
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -103,7 +157,12 @@ def login():
         
         flash('Usuário ou senha incorretos.', 'error')
     
-    return render_template('login.html')
+    # Usar template inline como fallback
+    try:
+        return render_template('login.html')
+    except:
+        from flask import render_template_string
+        return render_template_string(LOGIN_TEMPLATE)
 
 @app.route('/logout')
 @login_required
