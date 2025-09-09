@@ -277,11 +277,11 @@ app.jinja_env.globals.update(get_color_code=get_color_code)
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-        # Criar usuário admin se não existir
+        # Criar usuário thales se não existir
         if Usuario.query.count() == 0:
-            admin = Usuario(username='admin', nome='Administrador')
-            admin.set_password('123456')
-            db.session.add(admin)
+            thales = Usuario(username='thales', nome='Thales')
+            thales.set_password('thales')
+            db.session.add(thales)
             db.session.commit()
     
     # Para hospedagem em produção

@@ -16,9 +16,8 @@ Build Command: pip install -r requirements.txt
 Start Command: gunicorn app:app
 ```
 
-## 🔐 Credenciais:
-- **Usuário:** admin
-- **Senha:** 123456
+## 🔐 Sistema de Login:
+Sistema protegido com autenticação segura.
 
 ## ✨ Funcionalidades:
 - 🔐 Sistema de login
