@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Cadastrar Venda - Shop Pra Mim{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex align-items-center">
+            <a href="{{ url_for('listar_vendas') }}" class="btn btn-outline-secondary me-3">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <div>
+                <h1 class="h3 mb-0">Registrar Nova Venda</h1>
+                <p class="text-muted">Preencha os detalhes da venda</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="cliente_id" class="form-label">Cliente *</label>
+                            <select class="form-select" id="cliente_id" name="cliente_id" required>
+                                <option value="">Selecione o cliente...</option>
+                                {% for cliente in clientes %}
+                                <option value="{{ cliente.id }}">{{ cliente.nome }} - {{ cliente.email }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">
+                                <a href="{{ url_for('cadastrar_cliente') }}" target="_blank">Cadastrar novo cliente</a>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="valor" class="form-label">Valor da Venda *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">R$</span>
+                                <input type="number" class="form-control" id="valor" name="valor" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="marca" class="form-label">Marca *</label>
+                            <input type="text" class="form-control" id="marca" name="marca" placeholder="Ex: Nike, Adidas, Puma" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="modelo" class="form-label">Modelo *</label>
+                            <input type="text" class="form-control" id="modelo" name="modelo" placeholder="Ex: Air Max, Stan Smith" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="cor_tenis" class="form-label">Cor *</label>
+                            <select class="form-select" id="cor_tenis" name="cor_tenis" required>
+                                <option value="">Selecione a cor...</option>
+                                <option value="Preto">Preto</option>
+                                <option value="Branco">Branco</option>
+                                <option value="Azul">Azul</option>
+                                <option value="Vermelho">Vermelho</option>
+                                <option value="Verde">Verde</option>
+                                <option value="Amarelo">Amarelo</option>
+                                <option value="Rosa">Rosa</option>
+                                <option value="Roxo">Roxo</option>
+                                <option value="Laranja">Laranja</option>
+                                <option value="Cinza">Cinza</option>
+                                <option value="Marrom">Marrom</option>
+                                <option value="Multicolorido">Multicolorido</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="tamanho" class="form-label">Tamanho *</label>
+                            <select class="form-select" id="tamanho" name="tamanho" required>
+                                <option value="">Selecione o tamanho...</option>
+                                <option value="34">34</option>
+                                <option value="35">35</option>
+                                <option value="36">36</option>
+                                <option value="37">37</option>
+                                <option value="38">38</option>
+                                <option value="39">39</option>
+                                <option value="40">40</option>
+                                <option value="41">41</option>
+                                <option value="42">42</option>
+                                <option value="43">43</option>
+                                <option value="44">44</option>
+                                <option value="45">45</option>
+                                <option value="46">46</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('listar_vendas') }}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-shopping-cart me-2"></i>Registrar Venda
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Auto-sugestão de tamanho baseado no cliente selecionado
+document.getElementById('cliente_id').addEventListener('change', function() {
+    const clienteId = this.value;
+    if (clienteId) {
+        // Aqui você poderia fazer uma requisição AJAX para buscar o tamanho preferido do cliente
+        // Por simplicidade, vamos apenas focar no elemento
+        document.getElementById('tamanho').focus();
+    }
+});
+
+// Formatação do valor
+document.getElementById('valor').addEventListener('input', function(e) {
+    let value = e.target.value;
+    if (value && !isNaN(value)) {
+        // Limitar a 2 casas decimais
+        if (value.includes('.')) {
+            const parts = value.split('.');
+            if (parts[1] && parts[1].length > 2) {
+                e.target.value = parseFloat(value).toFixed(2);
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
