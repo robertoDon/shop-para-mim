@@ -235,7 +235,8 @@ def login():
     # Usar template inline como fallback
     try:
         return render_template('login.html')
-    except:
+    except Exception as e:
+        print(f"Erro ao carregar template login.html: {e}")
         from flask import render_template_string
         return render_template_string(LOGIN_TEMPLATE)
 
