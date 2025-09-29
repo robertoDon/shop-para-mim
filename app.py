@@ -77,7 +77,11 @@ def buscar_informacoes_produto(sku):
             'cor': 'Não especificada'
         }
 
-app = Flask(__name__)
+# Garantir que a pasta de templates seja encontrada corretamente em produção
+app = Flask(
+    __name__,
+    template_folder=os.path.join(os.path.dirname(__file__), 'templates')
+)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///loja_tenis.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'shop_pra_mim_2024_secreto'
