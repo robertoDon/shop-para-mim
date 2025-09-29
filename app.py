@@ -95,17 +95,23 @@ login_manager.login_view = 'login'
 login_manager.login_message = 'Por favor, faça login para acessar esta página.'
 login_manager.login_message_category = 'info'
 
-# Inicialização para ambiente de produção (ex.: Render com gunicorn)
-@app.before_first_request
+# Inicialização idempotente para produção (Flask 3 removeu before_first_request)
+app.config.setdefault('INIT_DONE', False)
+
+@app.before_request
 def inicializar_banco_e_admin():
+    if app.config.get('INIT_DONE'):
+        return
     try:
-        db.create_all()
-        # Criar usuário admin se não existir
-        if Usuario.query.count() == 0:
-            admin = Usuario(username='admin', nome='Administrador')
-            admin.set_password('123456')
-            db.session.add(admin)
-            db.session.commit()
+        with app.app_context():
+            db.create_all()
+            # Criar usuário admin se não existir
+            if Usuario.query.count() == 0:
+                admin = Usuario(username='admin', nome='Administrador')
+                admin.set_password('123456')
+                db.session.add(admin)
+                db.session.commit()
+        app.config['INIT_DONE'] = True
     except Exception as e:
         # Evitar quebrar a aplicação caso o banco ainda não esteja acessível no primeiro boot
         print(f"Falha ao inicializar banco/usuário admin: {e}")
