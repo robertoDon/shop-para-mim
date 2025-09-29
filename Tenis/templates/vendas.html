@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Vendas - Shop Pra Mim{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h3 mb-0">Histórico de Vendas</h1>
+                <p class="text-muted">Acompanhe todas as vendas realizadas</p>
+            </div>
+            <a href="{{ url_for('cadastrar_venda') }}" class="btn btn-success">
+                <i class="fas fa-plus me-2"></i>Nova Venda
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                {% if vendas %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Data</th>
+                                <th>Cliente</th>
+                                <th>Produto</th>
+                                <th>Cor</th>
+                                <th>Tamanho</th>
+                                <th>Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for venda in vendas %}
+                            <tr>
+                                <td>{{ venda.data_venda.strftime('%d/%m/%Y %H:%M') }}</td>
+                                <td>
+                                    <strong>{{ venda.cliente.nome }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ venda.cliente.email }}</small>
+                                </td>
+                                <td>
+                                    <strong>{{ venda.marca }} {{ venda.modelo }}</strong>
+                                </td>
+                                <td>
+                                    <span class="badge" style="background-color: {{ get_color_code(venda.cor_tenis) }}; color: white;">
+                                        {{ venda.cor_tenis }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ venda.tamanho }}</span>
+                                </td>
+                                <td>
+                                    <strong class="text-success">R$ {{ "%.2f"|format(venda.valor) }}</strong>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Nenhuma venda registrada</h5>
+                    <p class="text-muted">Registre sua primeira venda!</p>
+                    <a href="{{ url_for('cadastrar_venda') }}" class="btn btn-success">
+                        <i class="fas fa-plus me-2"></i>Registrar Primeira Venda
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function getColorCode(color) {
+    const colors = {
+        'Preto': '#000000',
+        'Branco': '#ffffff',
+        'Azul': '#0066cc',
+        'Vermelho': '#cc0000',
+        'Verde': '#00cc00',
+        'Amarelo': '#cccc00',
+        'Rosa': '#ff69b4',
+        'Roxo': '#8B00FF',
+        'Laranja': '#ff8c00',
+        'Cinza': '#808080',
+        'Marrom': '#8B4513'
+    };
+    return colors[color] || '#6c757d';
+}
+</script>
+{% endblock %}
