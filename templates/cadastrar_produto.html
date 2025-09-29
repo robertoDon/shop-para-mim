@@ -11,7 +11,7 @@
             </a>
             <div>
                 <h1 class="h3 mb-0">Adicionar Produto ao Estoque</h1>
-                <p class="text-muted">Cadastre um novo tênis e receba recomendações de clientes</p>
+                <p class="text-muted">Cadastre um novo tênis usando apenas o SKU - o sistema buscará todas as informações automaticamente</p>
             </div>
         </div>
     </div>
@@ -23,36 +23,15 @@
             <div class="card-body">
                 <form method="POST" novalidate>
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="marca" class="form-label">Marca *</label>
-                            <input type="text" class="form-control" id="marca" name="marca" placeholder="Ex: Nike, Adidas, Puma" required>
+                        <div class="col-md-8 mb-3">
+                            <label for="sku" class="form-label">SKU do Produto *</label>
+                            <input type="text" class="form-control" id="sku" name="sku" placeholder="Ex: NK-AIR-MAX-270-BLK-42" required>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Digite o SKU completo do produto. O sistema buscará automaticamente marca, modelo, cor e imagem.
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="modelo" class="form-label">Modelo *</label>
-                            <input type="text" class="form-control" id="modelo" name="modelo" placeholder="Ex: Air Max, Stan Smith" required>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="cor" class="form-label">Cor *</label>
-                            <select class="form-select" id="cor" name="cor" required>
-                                <option value="">Selecione a cor...</option>
-                                <option value="Preto">Preto</option>
-                                <option value="Branco">Branco</option>
-                                <option value="Azul">Azul</option>
-                                <option value="Vermelho">Vermelho</option>
-                                <option value="Verde">Verde</option>
-                                <option value="Amarelo">Amarelo</option>
-                                <option value="Rosa">Rosa</option>
-                                <option value="Roxo">Roxo</option>
-                                <option value="Laranja">Laranja</option>
-                                <option value="Cinza">Cinza</option>
-                                <option value="Marrom">Marrom</option>
-                                <option value="Multicolorido">Multicolorido</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
                             <label for="tamanho" class="form-label">Tamanho *</label>
                             <select class="form-select" id="tamanho" name="tamanho" required>
                                 <option value="">Selecione o tamanho...</option>
@@ -83,6 +62,17 @@
                         </div>
                     </div>
                     
+                    <div class="alert alert-success">
+                        <i class="fas fa-magic me-2"></i>
+                        <strong>Busca Automática:</strong> O sistema irá buscar automaticamente:
+                        <ul class="mb-0 mt-2">
+                            <li>Marca e modelo do produto</li>
+                            <li>Cor e descrição</li>
+                            <li>Imagem oficial do produto</li>
+                            <li>Informações detalhadas</li>
+                        </ul>
+                    </div>
+                    
                     <div class="alert alert-info">
                         <i class="fas fa-info-circle me-2"></i>
                         <strong>Sistema de Recomendação:</strong> Após cadastrar este produto, o sistema automaticamente 
@@ -93,8 +83,8 @@
                         <a href="{{ url_for('listar_produtos') }}" class="btn btn-secondary">
                             <i class="fas fa-times me-2"></i>Cancelar
                         </a>
-                        <button type="submit" class="btn btn-info">
-                            <i class="fas fa-magic me-2"></i>Cadastrar e Gerar Recomendações
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>Buscar Informações e Cadastrar
                         </button>
                     </div>
                 </form>

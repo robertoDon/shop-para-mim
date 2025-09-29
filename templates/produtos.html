@@ -26,7 +26,9 @@
                     <table class="table table-hover">
                         <thead class="table-light">
                             <tr>
+                                <th>Imagem</th>
                                 <th>Produto</th>
+                                <th>SKU</th>
                                 <th>Cor</th>
                                 <th>Tamanho</th>
                                 <th>Preço</th>
@@ -38,7 +40,22 @@
                             {% for produto in produtos %}
                             <tr>
                                 <td>
-                                    <strong>{{ produto.marca }} {{ produto.modelo }}</strong>
+                                    <img src="{{ produto.imagem_url or 'https://via.placeholder.com/50x50?text=' + produto.sku }}" 
+                                         alt="{{ produto.modelo }}" 
+                                         class="rounded" 
+                                         style="width: 50px; height: 50px; object-fit: cover;"
+                                         onerror="this.src='https://via.placeholder.com/50x50?text={{ produto.sku }}'">
+                                </td>
+                                <td>
+                                    <div>
+                                        <strong>{{ produto.marca }} {{ produto.modelo }}</strong>
+                                        {% if produto.descricao %}
+                                        <br><small class="text-muted">{{ produto.descricao[:50] }}{% if produto.descricao|length > 50 %}...{% endif %}</small>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    <code class="text-primary">{{ produto.sku }}</code>
                                 </td>
                                 <td>
                                     <span class="badge" style="background-color: {{ get_color_code(produto.cor) }}; color: white;">

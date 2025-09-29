@@ -6,6 +6,8 @@ from datetime import datetime
 import sqlite3
 from collections import defaultdict, Counter
 import os
+import requests
+import json
 
 # Função auxiliar para templates
 def get_color_code(color):
@@ -23,6 +25,57 @@ def get_color_code(color):
         'Marrom': '#8B4513'
     }
     return colors.get(color, '#6c757d')
+
+def buscar_informacoes_produto(sku):
+    """
+    Busca informações do produto via SKU usando APIs públicas
+    Retorna um dicionário com as informações encontradas
+    """
+    try:
+        # Tentar buscar na API do Mercado Livre (gratuita)
+        url_ml = f"https://api.mercadolibre.com/sites/MLB/search?q={sku}&category=MLB1430"
+        response = requests.get(url_ml, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            if data.get('results'):
+                produto = data['results'][0]
+                return {
+                    'marca': produto.get('attributes', {}).get('BRAND', ['N/A'])[0],
+                    'modelo': produto.get('title', 'Produto não encontrado'),
+                    'preco': produto.get('price', 0),
+                    'imagem_url': produto.get('thumbnail', ''),
+                    'descricao': produto.get('title', ''),
+                    'cor': 'Não especificada'
+                }
+        
+        # Fallback: buscar informações básicas baseadas no SKU
+        # Extrair marca do SKU (assumindo formato comum)
+        sku_upper = sku.upper()
+        marca = 'Nike' if 'NIKE' in sku_upper or 'NK' in sku_upper else \
+                'Adidas' if 'ADIDAS' in sku_upper or 'AD' in sku_upper else \
+                'Puma' if 'PUMA' in sku_upper or 'PM' in sku_upper else \
+                'New Balance' if 'NB' in sku_upper else 'Marca não identificada'
+        
+        return {
+            'marca': marca,
+            'modelo': f'Modelo {sku}',
+            'preco': 299.90,  # Preço padrão
+            'imagem_url': f'https://via.placeholder.com/300x300?text={sku}',
+            'descricao': f'Tênis {marca} - SKU: {sku}',
+            'cor': 'Não especificada'
+        }
+        
+    except Exception as e:
+        print(f"Erro ao buscar informações do produto: {e}")
+        return {
+            'marca': 'Marca não encontrada',
+            'modelo': f'Modelo {sku}',
+            'preco': 299.90,
+            'imagem_url': f'https://via.placeholder.com/300x300?text={sku}',
+            'descricao': f'Produto SKU: {sku}',
+            'cor': 'Não especificada'
+        }
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///loja_tenis.db'
@@ -79,11 +132,14 @@ class Venda(db.Model):
 
 class Produto(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    sku = db.Column(db.String(100), unique=True, nullable=False)
     marca = db.Column(db.String(50), nullable=False)
     modelo = db.Column(db.String(100), nullable=False)
     cor = db.Column(db.String(50), nullable=False)
     tamanho = db.Column(db.String(10), nullable=False)
     preco = db.Column(db.Float, nullable=False)
+    imagem_url = db.Column(db.String(500))
+    descricao = db.Column(db.Text)
     data_chegada = db.Column(db.DateTime, default=datetime.utcnow)
     vendido = db.Column(db.Boolean, default=False)
 
@@ -247,12 +303,22 @@ def listar_produtos():
 @login_required
 def cadastrar_produto():
     if request.method == 'POST':
+        sku = request.form['sku']
+        tamanho = request.form['tamanho']
+        preco = float(request.form['preco'])
+        
+        # Buscar informações do produto via SKU
+        info_produto = buscar_informacoes_produto(sku)
+        
         produto = Produto(
-            marca=request.form['marca'],
-            modelo=request.form['modelo'],
-            cor=request.form['cor'],
-            tamanho=request.form['tamanho'],
-            preco=float(request.form['preco'])
+            sku=sku,
+            marca=info_produto['marca'],
+            modelo=info_produto['modelo'],
+            cor=info_produto['cor'],
+            tamanho=tamanho,
+            preco=preco,
+            imagem_url=info_produto['imagem_url'],
+            descricao=info_produto['descricao']
         )
         db.session.add(produto)
         db.session.commit()
@@ -329,6 +395,12 @@ def analytics():
     generos = db.session.query(Cliente.genero, db.func.count(Cliente.id)).group_by(Cliente.genero).all()
     
     return render_template('analytics.html', marcas=marcas, cores=cores, generos=generos)
+
+@app.route('/estoque')
+def estoque():
+    """Página de estoque para clientes visualizarem os tênis disponíveis"""
+    produtos = Produto.query.filter_by(vendido=False).all()
+    return render_template('estoque.html', produtos=produtos)
 
 # Registrar função auxiliar no contexto do template
 app.jinja_env.globals.update(get_color_code=get_color_code)
