@@ -80,7 +80,8 @@ def buscar_informacoes_produto(sku):
 # Garantir que a pasta de templates seja encontrada corretamente em produção
 app = Flask(
     __name__,
-    template_folder=os.path.join(os.path.dirname(__file__), 'templates')
+    template_folder=os.path.join(os.path.dirname(__file__), 'templates'),
+    static_folder=os.path.join(os.path.dirname(__file__), 'static')
 )
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///loja_tenis.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
