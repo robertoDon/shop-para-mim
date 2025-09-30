@@ -152,6 +152,30 @@ def salvar_imagem_local(url: str, sku: str) -> str:
         print(f"Erro salvando imagem {sku}: {e}")
     return ''
 
+def garantir_svg_local(sku: str, titulo: str) -> str:
+    try:
+        pasta = os.path.join(app.static_folder, 'shoes')
+        os.makedirs(pasta, exist_ok=True)
+        nome = (sku or titulo or 'TENIS').replace(' ', '-').upper()
+        caminho = os.path.join(pasta, f"{nome}.svg")
+        if not os.path.exists(caminho):
+            svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800">
+<defs>
+  <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+    <stop offset="0%" stop-color="#0b1220"/>
+    <stop offset="100%" stop-color="#1e293b"/>
+  </linearGradient>
+</defs>
+<rect width="100%" height="100%" fill="url(#g)"/>
+<text x="50%" y="50%" font-family="Arial,Helvetica,sans-serif" font-size="42" fill="#e2e8f0" text-anchor="middle">{titulo}</text>
+</svg>'''
+            with open(caminho, 'w', encoding='utf-8') as f:
+                f.write(svg)
+        return f"/static/shoes/{nome}.svg"
+    except Exception as e:
+        print(f"Erro criando SVG para {sku}: {e}")
+    return ''
+
 # Modelos de dados
 class Usuario(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -482,6 +506,24 @@ def estoque():
                 print(f"Falha seed {item['sku']}: {e}")
         db.session.commit()
         produtos = Produto.query.filter_by(vendido=False).all()
+    # Baixar e servir imagens locais para cada produto
+    import re
+    for p in produtos:
+        sku = (p.sku or '').strip().upper()
+        if not p.imagem_url and re.match(r"^[A-Z0-9]{5,}-[0-9]{3}$", sku or ''):
+            style_color = sku.replace('-', '_')
+            p.imagem_url = f"https://images.nike.com/is/image/DotCom/{style_color}_A_PREM?wid=800&hei=800"
+        if p.imagem_url:
+            local = salvar_imagem_local(p.imagem_url, sku or p.modelo.replace(' ', '-').upper())
+            if local:
+                setattr(p, 'display_image', local)
+            else:
+                # Gera SVG local com texto se download falhar
+                svg = garantir_svg_local(sku, p.modelo)
+                setattr(p, 'display_image', svg or p.imagem_url)
+        else:
+            svg = garantir_svg_local(sku, p.modelo)
+            setattr(p, 'display_image', svg or f"https://via.placeholder.com/600x600?text={sku or p.modelo}")
     return render_template('estoque.html', produtos=produtos)
 
 # Registrar função auxiliar no contexto do template
