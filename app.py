@@ -427,6 +427,30 @@ def analytics():
 def estoque():
     """Página de estoque para clientes visualizarem os tênis disponíveis"""
     produtos = Produto.query.filter_by(vendido=False).all()
+    # Seed automático: 10 itens (5 Nike, 5 Jordan) se estoque estiver vazio
+    if not produtos:
+        seeds = [
+            # Nike
+            { 'sku': 'NIKE-AIR-MAX-270-BLACK', 'marca': 'Nike', 'modelo': 'Air Max 270 Black', 'cor': 'Preto', 'tamanho': '42', 'preco': 799.90, 'imagem_url': 'https://images.nike.com/is/image/DotCom/CT1280_001_A_PREM?bgc=f5f5f5&wid=800&hei=800', 'descricao': 'Nike Air Max 270 Black'},
+            { 'sku': 'NIKE-AIR-FORCE-1-WHITE', 'marca': 'Nike', 'modelo': 'Air Force 1 White', 'cor': 'Branco', 'tamanho': '41', 'preco': 749.90, 'imagem_url': 'https://images.nike.com/is/image/DotCom/315122_111_A_PREM?bgc=f5f5f5&wid=800&hei=800', 'descricao': 'Nike Air Force 1 White'},
+            { 'sku': 'NIKE-AIR-MAX-90-GREY', 'marca': 'Nike', 'modelo': 'Air Max 90 Grey', 'cor': 'Cinza', 'tamanho': '40', 'preco': 899.90, 'imagem_url': 'https://images.nike.com/is/image/DotCom/CN8490_002_A_PREM?bgc=f5f5f5&wid=800&hei=800', 'descricao': 'Nike Air Max 90'},
+            { 'sku': 'NIKE-DUNK-LOW-PANDA', 'marca': 'Nike', 'modelo': 'Dunk Low Panda', 'cor': 'Preto', 'tamanho': '43', 'preco': 999.90, 'imagem_url': 'https://images.nike.com/is/image/DotCom/DD1391_100_A_PREM?bgc=f5f5f5&wid=800&hei=800', 'descricao': 'Nike Dunk Low Panda'},
+            { 'sku': 'NIKE-BLAZER-MID-77', 'marca': 'Nike', 'modelo': 'Blazer Mid 77', 'cor': 'Branco', 'tamanho': '42', 'preco': 699.90, 'imagem_url': 'https://images.nike.com/is/image/DotCom/BQ6806_100_A_PREM?bgc=f5f5f5&wid=800&hei=800', 'descricao': 'Nike Blazer Mid 77'},
+            # Jordan
+            { 'sku': 'JORDAN-1-MID-CHICAGO', 'marca': 'Jordan', 'modelo': 'Air Jordan 1 Mid Chicago', 'cor': 'Vermelho', 'tamanho': '42', 'preco': 1299.90, 'imagem_url': 'https://images.nike.com/is/image/DotCom/554724_173_A_PREM?bgc=f5f5f5&wid=800&hei=800', 'descricao': 'AJ1 Mid Chicago'},
+            { 'sku': 'JORDAN-1-RETRO-BRED', 'marca': 'Jordan', 'modelo': 'Air Jordan 1 Retro Bred', 'cor': 'Preto', 'tamanho': '41', 'preco': 1599.90, 'imagem_url': 'https://images.nike.com/is/image/DotCom/555088_001_A_PREM?bgc=f5f5f5&wid=800&hei=800', 'descricao': 'AJ1 Retro Bred'},
+            { 'sku': 'JORDAN-4-WHITE-OREO', 'marca': 'Jordan', 'modelo': 'Air Jordan 4 White Oreo', 'cor': 'Branco', 'tamanho': '42', 'preco': 1699.90, 'imagem_url': 'https://images.nike.com/is/image/DotCom/CT8527_100_A_PREM?bgc=f5f5f5&wid=800&hei=800', 'descricao': 'AJ4 White Oreo'},
+            { 'sku': 'JORDAN-11-COOL-GREY', 'marca': 'Jordan', 'modelo': 'Air Jordan 11 Cool Grey', 'cor': 'Cinza', 'tamanho': '43', 'preco': 1799.90, 'imagem_url': 'https://images.nike.com/is/image/DotCom/CT8012_005_A_PREM?bgc=f5f5f5&wid=800&hei=800', 'descricao': 'AJ11 Cool Grey'},
+            { 'sku': 'JORDAN-3-CEMENT', 'marca': 'Jordan', 'modelo': 'Air Jordan 3 Black Cement', 'cor': 'Preto', 'tamanho': '42', 'preco': 1699.90, 'imagem_url': 'https://images.nike.com/is/image/DotCom/854262_001_A_PREM?bgc=f5f5f5&wid=800&hei=800', 'descricao': 'AJ3 Black Cement'}
+        ]
+        for item in seeds:
+            try:
+                if not Produto.query.filter_by(sku=item['sku']).first():
+                    db.session.add(Produto(**item))
+            except Exception as e:
+                print(f"Falha seed {item['sku']}: {e}")
+        db.session.commit()
+        produtos = Produto.query.filter_by(vendido=False).all()
     return render_template('estoque.html', produtos=produtos)
 
 # Registrar função auxiliar no contexto do template

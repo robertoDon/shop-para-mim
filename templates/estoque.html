@@ -13,12 +13,8 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
-        .hero-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 60px 0;
-            text-align: center;
-        }
+        /* Minimal: esconder header hero */
+        .hero-section { display: none; }
         
         .hero-title {
             font-size: 3.5rem;
@@ -154,13 +150,8 @@
             box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
         }
         
-        .stats-section {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            margin-bottom: 40px;
-        }
+        /* Minimal: esconder estatísticas */
+        .stats-section { display: none; }
         
         .stat-item {
             text-align: center;
@@ -181,30 +172,20 @@
             letter-spacing: 1px;
         }
         
-        .navbar-custom {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-        }
+        /* Minimal: tema escuro simples */
+        body { background: #0f172a; color: #e2e8f0; }
+        .navbar-custom { background: #0b1220; border-bottom: 1px solid #1e293b; }
         
-        .navbar-brand {
-            font-weight: 700;
-            color: #667eea !important;
-        }
+        .navbar-brand { font-weight: 700; color: #93c5fd !important; }
         
-        .btn-primary-custom {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 25px;
-            padding: 10px 25px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary-custom:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
+        .filter-section { background: transparent; box-shadow: none; border: 1px solid #1e293b; }
+        .filter-title { color: #cbd5e1; }
+        .form-select, .form-control { background: #0b1220; color: #e2e8f0; border: 1px solid #1e293b; }
+        .btn-primary-custom { background: #1d4ed8; border: none; }
+        .btn-primary-custom:hover { background: #1e40af; }
+        .card, .product-card { background: #0b1220; border: 1px solid #1e293b; }
+        .product-name { color: #e5e7eb; }
+        .product-price { color: #22c55e; }
         
         @media (max-width: 768px) {
             .hero-title {
