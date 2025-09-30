@@ -322,11 +322,11 @@
                  data-name="{{ produto.modelo }}"
                  data-sku="{{ produto.sku }}">
                 <div class="product-card">
-                    <img src="{{ produto.imagem_url or 'https://via.placeholder.com/600x600?text=' + produto.sku }}" 
+                    <img src="https://picsum.photos/seed/{{ produto.sku }}/600/600" 
                          alt="{{ produto.modelo }}" 
                          class="product-image"
                          loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                         onerror="this.onerror=null;this.src='https://via.placeholder.com/600x600?text={{ produto.sku }}'">
+                         onerror="this.onerror=null;this.src='https://picsum.photos/seed/{{ produto.sku }}'/600/600'">
                     
                     <div class="product-info">
                         <div class="product-brand">{{ produto.marca }}</div>
@@ -342,10 +342,11 @@
                         <div class="product-description">{{ produto.descricao }}</div>
                         {% endif %}
                         
-                        <div class="text-center">
-                            <span class="availability-badge">
-                                <i class="fas fa-check-circle me-1"></i>Disponível
-                            </span>
+                        <div class="text-center mt-2">
+                            <a class="btn btn-success" target="_blank" rel="noopener"
+                               href="https://wa.me/5548999488646?text={{ ('Tenho interesse no tênis ' + produto.marca + ' ' + produto.modelo + ' (SKU ' + produto.sku + ')').strip()|urlencode }}">
+                                <i class="fab fa-whatsapp me-1"></i>Tenho Interesse
+                            </a>
                         </div>
                     </div>
                 </div>
