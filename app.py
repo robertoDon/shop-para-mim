@@ -176,6 +176,47 @@ def garantir_svg_local(sku: str, titulo: str) -> str:
         print(f"Erro criando SVG para {sku}: {e}")
     return ''
 
+def buscar_imagem_por_sku(sku: str, titulo: str) -> str:
+    """Retorna caminho LOCAL da imagem salva para o SKU, buscando em fontes externas uma única vez.
+    Estratégia: 1) Nike CDN se SKU STYLECOLOR-COLOR; 2) Google Images (thumbnail) sem API; 3) SVG com título.
+    """
+    sku_up = (sku or '').strip().upper()
+    nome_base = (sku_up or titulo or 'TENIS').replace(' ', '-').upper()
+    # Já existe local?
+    pasta = os.path.join(app.static_folder, 'shoes')
+    os.makedirs(pasta, exist_ok=True)
+    destino_jpg = os.path.join(pasta, f"{nome_base}.jpg")
+    if os.path.exists(destino_jpg) and os.path.getsize(destino_jpg) > 1000:
+        return f"/static/shoes/{nome_base}.jpg"
+
+    # 1) Nike CDN
+    import re
+    if re.match(r"^[A-Z0-9]{5,}-[0-9]{3}$", sku_up):
+        style = sku_up.replace('-', '_')
+        nike_url = f"https://images.nike.com/is/image/DotCom/{style}_A_PREM?wid=800&hei=800"
+        local = salvar_imagem_local(nike_url, nome_base)
+        if local:
+            return local
+
+    # 2) Google Images (consulta simples ao HTML, buscando primeiro img src)
+    try:
+        q = requests.utils.quote(sku_up or titulo)
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        resp = requests.get(f"https://www.google.com/search?tbm=isch&q={q}", headers=headers, timeout=10)
+        if resp.status_code == 200:
+            import re as _re
+            m = _re.search(r"<img[^>]+src=\"(https:[^\"]+)\"", resp.text)
+            if m:
+                img = m.group(1)
+                local = salvar_imagem_local(img, nome_base)
+                if local:
+                    return local
+    except Exception as e:
+        print(f"Google images falhou {sku_up}: {e}")
+
+    # 3) SVG fallback
+    return garantir_svg_local(sku_up, titulo)
+
 # Modelos de dados
 class Usuario(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -406,6 +447,10 @@ def cadastrar_produto():
             imagem_url=info_produto['imagem_url'],
             descricao=info_produto['descricao']
         )
+        # Força download/salvamento local e atualiza DB para uso futuro sem rede
+        local_path = buscar_imagem_por_sku(produto.sku, produto.modelo)
+        if local_path:
+            produto.imagem_url = local_path
         db.session.add(produto)
         db.session.commit()
         
@@ -510,20 +555,16 @@ def estoque():
     import re
     for p in produtos:
         sku = (p.sku or '').strip().upper()
-        if not p.imagem_url and re.match(r"^[A-Z0-9]{5,}-[0-9]{3}$", sku or ''):
-            style_color = sku.replace('-', '_')
-            p.imagem_url = f"https://images.nike.com/is/image/DotCom/{style_color}_A_PREM?wid=800&hei=800"
-        if p.imagem_url:
-            local = salvar_imagem_local(p.imagem_url, sku or p.modelo.replace(' ', '-').upper())
-            if local:
-                setattr(p, 'display_image', local)
-            else:
-                # Gera SVG local com texto se download falhar
-                svg = garantir_svg_local(sku, p.modelo)
-                setattr(p, 'display_image', svg or p.imagem_url)
-        else:
-            svg = garantir_svg_local(sku, p.modelo)
-            setattr(p, 'display_image', svg or f"https://via.placeholder.com/600x600?text={sku or p.modelo}")
+        # Sempre resolve para local e atualiza no DB uma vez
+        local_display = buscar_imagem_por_sku(sku, p.modelo)
+        if local_display and p.imagem_url != local_display:
+            p.imagem_url = local_display
+            try:
+                db.session.add(p)
+                db.session.commit()
+            except Exception as e:
+                print('Falha ao atualizar imagem local do produto:', e)
+        setattr(p, 'display_image', local_display or p.imagem_url)
     return render_template('estoque.html', produtos=produtos)
 
 # Registrar função auxiliar no contexto do template
