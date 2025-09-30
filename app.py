@@ -642,22 +642,18 @@ def sync_estoque():
         db.session.delete(p)
     db.session.commit()
     
-    # SKUs específicos que existem em static/shoes/
-    skus_corretos = [
-        '554724-173', 'CN8490-002', 'CT8527-100', 
-        'CZ0790-106', 'DD1391-100', 'DM7866-140'
+    # Apenas os 6 SKUs que realmente existem em static/shoes/
+    produtos_fixos = [
+        ('554724-173', 'Nike', 'Air Max 270', 'Preto', '42', 799.90, '/static/shoes/554724-173.jpeg'),
+        ('CN8490-002', 'Nike', 'Air Force 1', 'Branco', '41', 749.90, '/static/shoes/CN8490-002.webp'),
+        ('CT8527-100', 'Nike', 'Air Max 90', 'Cinza', '40', 899.90, '/static/shoes/CT8527-100.jpeg'),
+        ('CZ0790-106', 'Jordan', 'Air Jordan 1 Low OG Chicago', 'Vermelho', '42', 1599.90, '/static/shoes/CZ0790-106.webp'),
+        ('DD1391-100', 'Jordan', 'Air Jordan 1', 'Branco', '41', 1299.90, '/static/shoes/DD1391-100.webp'),
+        ('DM7866-140', 'Jordan', 'Fragment x Travis Scott x Air Jordan 1 Low OG SP Sail Military Blue', 'Azul', '42', 2199.90, '/static/shoes/DM7866-140.webp')
     ]
     
     created = []
-    for sku in skus_corretos:
-        info = buscar_informacoes_produto(sku)
-        marca = info.get('marca') or 'Nike'
-        modelo = info.get('modelo') or sku
-        cor = info.get('cor') or ''
-        tamanho = info.get('tamanho') or '42'
-        preco = float(info.get('preco') or 0) or 999.90
-        local = f"/static/shoes/{sku}.webp"  # Assumindo formato webp
-        
+    for sku, marca, modelo, cor, tamanho, preco, imagem_url in produtos_fixos:
         produto = Produto(
             sku=sku,
             marca=marca,
@@ -665,11 +661,11 @@ def sync_estoque():
             cor=cor,
             tamanho=tamanho,
             preco=preco,
-            imagem_url=local,
-            descricao=info.get('descricao') or modelo
+            imagem_url=imagem_url,
+            descricao=modelo
         )
         db.session.add(produto)
-        created.append((sku, modelo, local))
+        created.append((sku, modelo, imagem_url))
     
     db.session.commit()
     return f"Estoque sincronizado com {len(created)} itens: {[f'{sku}|{modelo}' for sku, modelo, _ in created]}"
