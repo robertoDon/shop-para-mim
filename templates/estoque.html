@@ -322,11 +322,11 @@
                  data-name="{{ produto.modelo }}"
                  data-sku="{{ produto.sku }}">
                 <div class="product-card">
-                    <img src="https://picsum.photos/seed/{{ produto.sku }}/600/600" 
+                    <img src="{{ produto.imagem_url or ('https://via.placeholder.com/600x600?text=' + produto.sku) }}" 
                          alt="{{ produto.modelo }}" 
                          class="product-image"
                          loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                         onerror="this.onerror=null;this.src='https://picsum.photos/seed/{{ produto.sku }}'/600/600'">
+                         onerror="this.onerror=null;this.src='https://via.placeholder.com/600x600?text={{ produto.sku }}'">
                     
                     <div class="product-info">
                         <div class="product-brand">{{ produto.marca }}</div>

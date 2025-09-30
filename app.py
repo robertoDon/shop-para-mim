@@ -32,37 +32,47 @@ def buscar_informacoes_produto(sku):
     Retorna um dicionário com as informações encontradas
     """
     try:
-        # Tentar buscar na API do Mercado Livre (gratuita)
+        sku = sku.strip().upper()
+        # Suporte específico a Nike/Jordan: STYLE-COLOR (ex.: CT1280-001)
+        # Vamos construir a URL oficial de imagem do produto no CDN da Nike
+        import re
+        m = re.match(r"^[A-Z0-9]{5,}-[0-9]{3}$", sku)
+        if m:
+            style_color = sku.replace('-', '_')
+            imagem = f"https://images.nike.com/is/image/DotCom/{style_color}_A_PREM?wid=800&hei=800"
+            return {
+                'marca': 'Nike',            # Jordan pertence à Nike; manteremos Nike por padrão
+                'modelo': sku,               # Sem catálogo local; exibimos o SKU como modelo
+                'preco': 0,
+                'imagem_url': imagem,
+                'descricao': f'Imagem oficial para SKU {sku}',
+                'cor': 'Não especificada'
+            }
+        # Tenta buscar no Mercado Livre como alternativa (pode trazer imagem genérica do anúncio)
         url_ml = f"https://api.mercadolibre.com/sites/MLB/search?q={sku}&category=MLB1430"
         response = requests.get(url_ml, timeout=10)
-        
         if response.status_code == 200:
             data = response.json()
             if data.get('results'):
                 produto = data['results'][0]
+                imagem = produto.get('thumbnail', '')
+                if imagem:
+                    imagem = imagem.replace('http://', 'https://')
                 return {
                     'marca': produto.get('attributes', {}).get('BRAND', ['N/A'])[0],
-                    'modelo': produto.get('title', 'Produto não encontrado'),
+                    'modelo': produto.get('title', sku),
                     'preco': produto.get('price', 0),
-                    'imagem_url': produto.get('thumbnail', ''),
+                    'imagem_url': imagem,
                     'descricao': produto.get('title', ''),
                     'cor': 'Não especificada'
                 }
-        
-        # Fallback: buscar informações básicas baseadas no SKU
-        # Extrair marca do SKU (assumindo formato comum)
-        sku_upper = sku.upper()
-        marca = 'Nike' if 'NIKE' in sku_upper or 'NK' in sku_upper else \
-                'Adidas' if 'ADIDAS' in sku_upper or 'AD' in sku_upper else \
-                'Puma' if 'PUMA' in sku_upper or 'PM' in sku_upper else \
-                'New Balance' if 'NB' in sku_upper else 'Marca não identificada'
-        
+        # Fallback final
         return {
-            'marca': marca,
-            'modelo': f'Modelo {sku}',
-            'preco': 299.90,  # Preço padrão
-            'imagem_url': f'https://via.placeholder.com/300x300?text={sku}',
-            'descricao': f'Tênis {marca} - SKU: {sku}',
+            'marca': 'Nike',
+            'modelo': sku,
+            'preco': 0,
+            'imagem_url': f'https://via.placeholder.com/600x600?text={sku}',
+            'descricao': f'Produto SKU: {sku}',
             'cor': 'Não especificada'
         }
         
