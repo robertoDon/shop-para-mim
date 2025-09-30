@@ -322,7 +322,7 @@
                  data-name="{{ produto.modelo }}"
                  data-sku="{{ produto.sku }}">
                 <div class="product-card">
-                    <img src="{{ produto.imagem_url or ('https://via.placeholder.com/600x600?text=' + produto.sku) }}" 
+                    <img src="{{ ('https://images.weserv.nl/?url=' + ( (produto.imagem_url or '')|replace('https://','')|replace('http://','') ) + '&w=600&h=600&fit=cover') if produto.imagem_url else ('https://via.placeholder.com/600x600?text=' + produto.sku) }}" 
                          alt="{{ produto.modelo }}" 
                          class="product-image"
                          loading="lazy" decoding="async" referrerpolicy="no-referrer"

@@ -40,11 +40,12 @@ def buscar_informacoes_produto(sku):
         if m:
             style_color = sku.replace('-', '_')
             imagem = f"https://images.nike.com/is/image/DotCom/{style_color}_A_PREM?wid=800&hei=800"
+            local = salvar_imagem_local(imagem, sku)
             return {
                 'marca': 'Nike',            # Jordan pertence à Nike; manteremos Nike por padrão
                 'modelo': sku,               # Sem catálogo local; exibimos o SKU como modelo
                 'preco': 0,
-                'imagem_url': imagem,
+                'imagem_url': local or imagem,
                 'descricao': f'Imagem oficial para SKU {sku}',
                 'cor': 'Não especificada'
             }
@@ -58,11 +59,12 @@ def buscar_informacoes_produto(sku):
                 imagem = produto.get('thumbnail', '')
                 if imagem:
                     imagem = imagem.replace('http://', 'https://')
+                local = salvar_imagem_local(imagem, sku)
                 return {
                     'marca': produto.get('attributes', {}).get('BRAND', ['N/A'])[0],
                     'modelo': produto.get('title', sku),
                     'preco': produto.get('price', 0),
-                    'imagem_url': imagem,
+                    'imagem_url': local or imagem,
                     'descricao': produto.get('title', ''),
                     'cor': 'Não especificada'
                 }
@@ -126,6 +128,29 @@ def inicializar_banco_e_admin():
     except Exception as e:
         # Evitar quebrar a aplicação caso o banco ainda não esteja acessível no primeiro boot
         print(f"Falha ao inicializar banco/usuário admin: {e}")
+
+def salvar_imagem_local(url: str, sku: str) -> str:
+    try:
+        if not url or not sku:
+            return ''
+        pasta = os.path.join(app.static_folder, 'shoes')
+        os.makedirs(pasta, exist_ok=True)
+        caminho = os.path.join(pasta, f"{sku}.jpg")
+        if os.path.exists(caminho) and os.path.getsize(caminho) > 1000:
+            return f"/static/shoes/{sku}.jpg"
+        # Baixa com headers para evitar bloqueio
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
+            'Referer': 'https://www.nike.com/'
+        }
+        r = requests.get(url, headers=headers, timeout=10)
+        if r.status_code == 200 and r.content and len(r.content) > 1000:
+            with open(caminho, 'wb') as f:
+                f.write(r.content)
+            return f"/static/shoes/{sku}.jpg"
+    except Exception as e:
+        print(f"Erro salvando imagem {sku}: {e}")
+    return ''
 
 # Modelos de dados
 class Usuario(UserMixin, db.Model):
