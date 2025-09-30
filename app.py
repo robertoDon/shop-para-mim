@@ -189,6 +189,34 @@ def buscar_imagem_por_sku(sku: str, titulo: str) -> str:
     if os.path.exists(destino_jpg) and os.path.getsize(destino_jpg) > 1000:
         return f"/static/shoes/{nome_base}.jpg"
 
+    # 0) Droper (prioridade alta) – procura página do produto e extrai imagem OG
+    try:
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        # tentativa 1: busca direta por SKU
+        r = requests.get(f"https://droper.app/search?q={requests.utils.quote(sku_up)}", headers=headers, timeout=12)
+        if r.status_code == 200:
+            import re as _re
+            # pega primeiro link de produto /d/{id}/slug
+            m = _re.search(r"/d/\d+/[A-Za-z0-9_\-]+", r.text)
+            if m:
+                prod_url = "https://droper.app" + m.group(0)
+                rp = requests.get(prod_url, headers=headers, timeout=12)
+                if rp.status_code == 200:
+                    # tenta og:image
+                    mo = _re.search(r"property=\"og:image\"\s*content=\"(https:[^\"]+)\"", rp.text)
+                    img = mo.group(1) if mo else None
+                    if not img:
+                        mo = _re.search(r"<img[^>]+src=\"(https:[^\"]+)\"", rp.text)
+                        img = mo.group(1) if mo else None
+                    if img:
+                        # garantir alta resolução quando possível
+                        img = _re.sub(r"=s\d+", "=s1200", img)
+                        local = salvar_imagem_local(img, nome_base, min_bytes=120_000)
+                        if local:
+                            return local
+    except Exception as e:
+        print(f"Droper falhou {sku_up}: {e}")
+
     # 1) Nike CDN
     import re
     if re.match(r"^[A-Z0-9]{5,}-[0-9]{3}$", sku_up):
@@ -226,9 +254,9 @@ def caminho_local_por_sku(sku: str, titulo: str) -> str:
     pasta = os.path.join(app.static_folder, 'shoes')
     os.makedirs(pasta, exist_ok=True)
     base = (sku or titulo or 'TENIS').replace(' ', '-').upper()
-    for ext in ('.jpg', '.jpeg', '.png', '.svg'):
+    for ext in ('.jpg', '.jpeg', '.png', '.webp', '.svg'):
         p = os.path.join(pasta, base + ext)
-        if os.path.exists(p) and os.path.getsize(p) > 1024:
+        if os.path.exists(p) and os.path.getsize(p) > 0:
             return f"/static/shoes/{base + ext}"
     return ''
 
