@@ -219,11 +219,12 @@ def buscar_imagem_por_sku(sku: str, titulo: str) -> str:
 
     # 1) Nike CDN
     import re
-    if re.match(r"^[A-Z0-9]{5,}-[0-9]{3}$", sku_up):
-        style = sku_up.replace('-', '_')
+    import re
+    style_candidate = sku_up if re.match(r"^[A-Z0-9]{5,}-[0-9]{3}$", sku_up) else map_model_to_stylecode(sku, titulo)
+    if style_candidate:
         # pedir 1200px para garantir qualidade ~720p+
-        nike_url = f"https://images.nike.com/is/image/DotCom/{style}_A_PREM?wid=1200&hei=1200"
-        local = salvar_imagem_local(nike_url, nome_base, min_bytes=120_000)
+        nike_url = f"https://images.nike.com/is/image/DotCom/{style_candidate.replace('-', '_')}_A_PREM?wid=1200&hei=1200"
+        local = salvar_imagem_local(nike_url, nome_base, min_bytes=50_000)
         if local:
             return local
 
@@ -258,6 +259,27 @@ def caminho_local_por_sku(sku: str, titulo: str) -> str:
         p = os.path.join(pasta, base + ext)
         if os.path.exists(p) and os.path.getsize(p) > 0:
             return f"/static/shoes/{base + ext}"
+    # tenta por style-code conhecido quando o SKU não é padrão
+    alt = map_model_to_stylecode(sku, titulo)
+    if alt:
+        for ext in ('.jpg', '.jpeg', '.png', '.webp', '.svg'):
+            p = os.path.join(pasta, alt + ext)
+            if os.path.exists(p) and os.path.getsize(p) > 0:
+                return f"/static/shoes/{alt + ext}"
+    return ''
+
+def map_model_to_stylecode(sku: str, titulo: str) -> str:
+    key = (titulo or sku or '').lower()
+    MAP = {
+        'air max 270 black': 'CT1280-001',
+        'air force 1 white': '315122-111',
+        'air max 90 grey': 'CN8490-002',
+        'dunk low panda': 'DD1391-100',
+        'air jordan 1 mid chicago': '554724-173',
+    }
+    for name, style in MAP.items():
+        if name in key:
+            return style
     return ''
 
 # Modelos de dados
