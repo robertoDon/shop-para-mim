@@ -8,10 +8,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
     <style>
-        body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        html, body { background: #ffffff !important; }
+        body { color: #111827; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial; padding-top: 84px; }
         
         /* Minimal: esconder header hero */
         .hero-section { display: none; }
@@ -27,47 +25,18 @@
             opacity: 0.9;
         }
         
-        .product-card {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            margin-bottom: 30px;
-        }
-        
-        .product-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-        }
-        
-        .product-image { width: 100%; height: 300px; object-fit: cover; background: #0b1220; }
+        .product-card { background: transparent; margin-bottom: 36px; }
+        .product-image { width: 100%; height: 420px; object-fit: contain; background: #fff; }
         
         .product-info {
             padding: 25px;
         }
         
-        .product-brand {
-            font-size: 0.9rem;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 5px;
-        }
+        .product-brand { font-size: 0.8rem; color: #6b7280; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 4px; }
         
-        .product-name {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
-            line-height: 1.3;
-        }
+        .product-name { font-size: 1.1rem; font-weight: 600; color: #111827; margin-bottom: 6px; line-height: 1.3; }
         
-        .product-sku {
-            font-size: 0.85rem;
-            color: #888;
-            margin-bottom: 15px;
-        }
+        .product-sku { font-size: 0.8rem; color: #9ca3af; margin-bottom: 8px; }
         
         .product-details {
             display: flex;
@@ -76,19 +45,9 @@
             margin-bottom: 20px;
         }
         
-        .product-size {
-            background: #f8f9fa;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-weight: 600;
-            color: #495057;
-        }
+        .product-size { background: #f3f4f6; padding: 6px 10px; border-radius: 6px; font-weight: 600; color: #374151; }
         
-        .product-price {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #28a745;
-        }
+        .product-price { font-size: 1.25rem; font-weight: 700; color: #16a34a; }
         
         .product-description {
             color: #666;
@@ -107,13 +66,8 @@
             display: inline-block;
         }
         
-        .filter-section {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            margin-bottom: 40px;
-        }
+        .filter-section { background: #ffffff; padding: 12px 0; border-bottom: 1px solid #e5e7eb; margin-bottom: 8px; }
+        .form-select, .form-control { border: 1px solid #e5e7eb; border-radius: 8px; }
         
         .filter-title {
             font-size: 1.3rem;
@@ -167,20 +121,18 @@
             letter-spacing: 1px;
         }
         
-        /* Minimal: tema escuro simples */
-        body { background: #0f172a; color: #e2e8f0; }
-        .navbar-custom { background: #0b1220; border-bottom: 1px solid #1e293b; }
-        
-        .navbar-brand { font-weight: 700; color: #93c5fd !important; }
-        
-        .filter-section { background: transparent; box-shadow: none; border: 1px solid #1e293b; }
-        .filter-title { color: #cbd5e1; }
-        .form-select, .form-control { background: #0b1220; color: #e2e8f0; border: 1px solid #1e293b; }
-        .btn-primary-custom { background: #1d4ed8; border: none; }
-        .btn-primary-custom:hover { background: #1e40af; }
-        .card, .product-card { background: #0b1220; border: 1px solid #1e293b; }
-        .product-name { color: #e5e7eb; }
-        .product-price { color: #22c55e; }
+        /* ajustes finais claros */
+        .navbar-custom { background: #ffffff; border-bottom: 1px solid #e5e7eb; }
+        .navbar-brand { font-weight: 700; color: #111827 !important; }
+        .filter-section { background: #ffffff; box-shadow: none; border: none; }
+        .filter-title { color: #111827; }
+        .form-select, .form-control { background:#ffffff; color:#111827; border:1px solid #e5e7eb; }
+        .btn-primary-custom { background: #374151; border: none; }
+        .btn-primary-custom:hover { background: #111827; }
+        .card, .product-card { background:#ffffff !important; border:none !important; }
+        .product-info { background:#ffffff !important; color:#111827 !important; }
+        .product-name { color:#111827 !important; }
+        .product-price { color:#16a34a !important; }
         
         @media (max-width: 768px) {
             .hero-title {
@@ -195,33 +147,12 @@
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light navbar-custom fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <i class="fas fa-shopping-bag me-2"></i>Shop Pra Mim
+    <nav class="navbar navbar-expand-lg navbar-light navbar-custom fixed-top" style="background:#fff;border-bottom:1px solid #e5e7eb;">
+        <div class="container d-flex justify-content-center align-items-center" style="min-height:72px;">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Shop Pra Mim" style="height:28px;" class="me-2">
+                <span class="fw-bold text-dark">Shop Pra Mim</span>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">
-                            <i class="fas fa-home me-1"></i>Início
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/estoque">
-                            <i class="fas fa-box me-1"></i>Estoque Público
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/login">
-                            <i class="fas fa-sign-in-alt me-1"></i>Login
-                        </a>
-                    </li>
-                </ul>
-            </div>
         </div>
     </nav>
 
@@ -302,10 +233,14 @@
                 </div>
                 <div class="col-md-2">
                     <div class="filter-group">
-                        <label class="filter-label">&nbsp;</label>
-                        <button class="btn btn-primary-custom w-100" onclick="clearFilters()">
-                            <i class="fas fa-times me-1"></i>Limpar
-                        </button>
+                        <label class="filter-label">Ordenar por</label>
+                        <select class="form-select" id="sortSelect">
+                            <option value="">Padrão</option>
+                            <option value="preco_asc">Preço: menor para maior</option>
+                            <option value="preco_desc">Preço: maior para menor</option>
+                            <option value="marca_asc">Marca (A-Z)</option>
+                            <option value="marca_desc">Marca (Z-A)</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -322,7 +257,7 @@
                  data-name="{{ produto.modelo }}"
                  data-sku="{{ produto.sku }}">
                 <div class="product-card">
-                    <img src="{{ ('https://images.weserv.nl/?url=' + ( (produto.imagem_url or '')|replace('https://','')|replace('http://','') ) + '&w=600&h=600&fit=cover') if produto.imagem_url else ('https://via.placeholder.com/600x600?text=' + produto.sku) }}" 
+                    <img src="{{ produto.display_image or produto.imagem_url or ('https://via.placeholder.com/600x600?text=' + produto.sku) }}" 
                          alt="{{ produto.modelo }}" 
                          class="product-image"
                          loading="lazy" decoding="async" referrerpolicy="no-referrer"
@@ -384,6 +319,7 @@
         document.getElementById('searchInput').addEventListener('input', filterProducts);
         document.getElementById('brandFilter').addEventListener('change', filterProducts);
         document.getElementById('sizeFilter').addEventListener('change', filterProducts);
+        document.getElementById('sortSelect').addEventListener('change', sortProducts);
 
         function filterProducts() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
@@ -408,6 +344,27 @@
                     product.style.display = 'none';
                 }
             });
+        }
+
+        function sortProducts() {
+            const sortValue = document.getElementById('sortSelect').value;
+            const grid = document.getElementById('productsGrid');
+            const cards = Array.from(grid.children);
+            const readPrice = card => {
+                const priceEl = card.querySelector('.product-price');
+                if (!priceEl) return 0;
+                const text = priceEl.textContent.replace(/[^0-9,\.]/g, '').replace('.', '').replace(',', '.');
+                return parseFloat(text) || 0;
+            };
+            const readBrand = card => (card.querySelector('.product-brand')?.textContent || '').toLowerCase();
+
+            let sorted = cards;
+            if (sortValue === 'preco_asc') sorted = cards.sort((a,b)=> readPrice(a)-readPrice(b));
+            else if (sortValue === 'preco_desc') sorted = cards.sort((a,b)=> readPrice(b)-readPrice(a));
+            else if (sortValue === 'marca_asc') sorted = cards.sort((a,b)=> readBrand(a).localeCompare(readBrand(b)));
+            else if (sortValue === 'marca_desc') sorted = cards.sort((a,b)=> readBrand(b).localeCompare(readBrand(a)));
+
+            sorted.forEach(card=> grid.appendChild(card));
         }
 
         function clearFilters() {

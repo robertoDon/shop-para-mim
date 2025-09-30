@@ -326,6 +326,7 @@ LOGIN_TEMPLATE = '''
         body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
         .login-card { background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); overflow: hidden; max-width: 400px; width: 100%; }
         .login-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; }
+        .login-header h2 { font-size: 3.0rem; font-weight: 1000; letter-spacing: .3px; }
         .login-body { padding: 30px; }
         .btn-login { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; width: 100%; padding: 12px; border-radius: 8px; color: white; font-weight: 500; }
         .form-control { border-radius: 8px; padding: 12px; border: 2px solid #e9ecef; }
