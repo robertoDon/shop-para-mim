@@ -221,6 +221,17 @@ def buscar_imagem_por_sku(sku: str, titulo: str) -> str:
     # 3) SVG fallback
     return garantir_svg_local(sku_up, titulo)
 
+def caminho_local_por_sku(sku: str, titulo: str) -> str:
+    """Verifica em static/shoes por arquivos locais com nome do SKU (extensões comuns)."""
+    pasta = os.path.join(app.static_folder, 'shoes')
+    os.makedirs(pasta, exist_ok=True)
+    base = (sku or titulo or 'TENIS').replace(' ', '-').upper()
+    for ext in ('.jpg', '.jpeg', '.png', '.svg'):
+        p = os.path.join(pasta, base + ext)
+        if os.path.exists(p) and os.path.getsize(p) > 1024:
+            return f"/static/shoes/{base + ext}"
+    return ''
+
 # Modelos de dados
 class Usuario(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -560,7 +571,8 @@ def estoque():
     for p in produtos:
         sku = (p.sku or '').strip().upper()
         # Sempre resolve para local e atualiza no DB uma vez
-        local_display = buscar_imagem_por_sku(sku, p.modelo)
+        # Prioriza arquivo local já colocado manualmente na pasta static/shoes
+        local_display = caminho_local_por_sku(sku, p.modelo) or buscar_imagem_por_sku(sku, p.modelo)
         if local_display and p.imagem_url != local_display:
             p.imagem_url = local_display
             try:
