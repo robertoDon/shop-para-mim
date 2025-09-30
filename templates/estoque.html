@@ -41,12 +41,7 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.15);
         }
         
-        .product-image {
-            width: 100%;
-            height: 300px;
-            object-fit: cover;
-            background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
-        }
+        .product-image { width: 100%; height: 300px; object-fit: cover; background: #0b1220; }
         
         .product-info {
             padding: 25px;
@@ -327,10 +322,11 @@
                  data-name="{{ produto.modelo }}"
                  data-sku="{{ produto.sku }}">
                 <div class="product-card">
-                    <img src="{{ produto.imagem_url or 'https://via.placeholder.com/300x300?text=' + produto.sku }}" 
+                    <img src="{{ produto.imagem_url or 'https://via.placeholder.com/600x600?text=' + produto.sku }}" 
                          alt="{{ produto.modelo }}" 
                          class="product-image"
-                         onerror="this.src='https://via.placeholder.com/300x300?text={{ produto.sku }}'">
+                         loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                         onerror="this.onerror=null;this.src='https://via.placeholder.com/600x600?text={{ produto.sku }}'">
                     
                     <div class="product-info">
                         <div class="product-brand">{{ produto.marca }}</div>
