@@ -129,7 +129,7 @@ def inicializar_banco_e_admin():
         # Evitar quebrar a aplicação caso o banco ainda não esteja acessível no primeiro boot
         print(f"Falha ao inicializar banco/usuário admin: {e}")
 
-def salvar_imagem_local(url: str, sku: str) -> str:
+def salvar_imagem_local(url: str, sku: str, min_bytes: int = 100_000) -> str:
     try:
         if not url or not sku:
             return ''
@@ -143,8 +143,8 @@ def salvar_imagem_local(url: str, sku: str) -> str:
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
             'Referer': 'https://www.nike.com/'
         }
-        r = requests.get(url, headers=headers, timeout=10)
-        if r.status_code == 200 and r.content and len(r.content) > 1000:
+        r = requests.get(url, headers=headers, timeout=15, allow_redirects=True)
+        if r.status_code == 200 and r.content and len(r.content) >= min_bytes:
             with open(caminho, 'wb') as f:
                 f.write(r.content)
             return f"/static/shoes/{sku}.jpg"
@@ -193,8 +193,9 @@ def buscar_imagem_por_sku(sku: str, titulo: str) -> str:
     import re
     if re.match(r"^[A-Z0-9]{5,}-[0-9]{3}$", sku_up):
         style = sku_up.replace('-', '_')
-        nike_url = f"https://images.nike.com/is/image/DotCom/{style}_A_PREM?wid=800&hei=800"
-        local = salvar_imagem_local(nike_url, nome_base)
+        # pedir 1200px para garantir qualidade ~720p+
+        nike_url = f"https://images.nike.com/is/image/DotCom/{style}_A_PREM?wid=1200&hei=1200"
+        local = salvar_imagem_local(nike_url, nome_base, min_bytes=120_000)
         if local:
             return local
 
@@ -205,10 +206,13 @@ def buscar_imagem_por_sku(sku: str, titulo: str) -> str:
         resp = requests.get(f"https://www.google.com/search?tbm=isch&q={q}", headers=headers, timeout=10)
         if resp.status_code == 200:
             import re as _re
-            m = _re.search(r"<img[^>]+src=\"(https:[^\"]+)\"", resp.text)
+            # procura primeiro src e depois data-src maior
+            m = _re.search(r"data-src=\"(https:[^\"]+?=s\d+)\"", resp.text) or _re.search(r"<img[^>]+src=\"(https:[^\"]+)\"", resp.text)
             if m:
                 img = m.group(1)
-                local = salvar_imagem_local(img, nome_base)
+                # tenta aumentar tamanho quando for formato '=s200' -> '=s1200'
+                img = _re.sub(r"=s\d+", "=s1200", img)
+                local = salvar_imagem_local(img, nome_base, min_bytes=120_000)
                 if local:
                     return local
     except Exception as e:
