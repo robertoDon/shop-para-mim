@@ -593,6 +593,22 @@ def analytics():
     
     return render_template('analytics.html', marcas=marcas, cores=cores, generos=generos)
 
+@app.route('/deletar_produto/<int:produto_id>', methods=['POST'])
+@login_required
+def deletar_produto(produto_id):
+    """Deleta um produto do estoque"""
+    produto = Produto.query.get_or_404(produto_id)
+    
+    try:
+        db.session.delete(produto)
+        db.session.commit()
+        flash(f'Produto {produto.marca} {produto.modelo} (SKU: {produto.sku}) foi deletado com sucesso!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Erro ao deletar produto: {str(e)}', 'error')
+    
+    return redirect(url_for('listar_produtos'))
+
 @app.route('/estoque')
 def estoque():
     """Página de estoque para clientes visualizarem os tênis disponíveis"""

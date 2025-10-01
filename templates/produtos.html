@@ -39,6 +39,7 @@
                                 <th>Preço</th>
                                 <th>Data de Chegada</th>
                                 <th>Status</th>
+                                <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -78,6 +79,13 @@
                                     <span class="badge bg-{{ 'success' if not produto.vendido else 'secondary' }}">
                                         {{ 'Disponível' if not produto.vendido else 'Vendido' }}
                                     </span>
+                                </td>
+                                <td>
+                                    <form method="POST" action="{{ url_for('deletar_produto', produto_id=produto.id) }}" style="display: inline;" onsubmit="return confirm('Tem certeza que deseja deletar o produto {{ produto.marca }} {{ produto.modelo }} (SKU: {{ produto.sku }})? Esta ação não pode ser desfeita.');">
+                                        <button type="submit" class="btn btn-danger btn-sm" title="Deletar produto">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                             {% endfor %}
